@@ -33,8 +33,64 @@
 
 接下來會有個名為`Git-github_notes`的目錄被建立，並在其下初始化名為`.git`的目錄。 拉下所有存在該版本控制倉庫的所有資料，並取出最新版本為工作複本。 若讀者進入新建立的 `grit` 目錄，會看到專案的檔案都在這兒，且可使用。 若想要複製版本控制倉庫到Git-github_notes以外其它名字的目錄，只需要在下一個參數指定即可：
 
-	$ git clone git://github.com/schacon/grit.git mygit
+	$ git clone https://github.com/DONG-GUAN-CHENG/Git-github_notes.git mygit
 
 這個命令做的事大致如同上一個命令，只不過目的目錄名會被更改為mygit。
 
 Git提供很多種協定使用。 上一個範例採用 `git://` 協定，讀者可能會看過 `http(s)://` 或者 `user@server:/path.git` 等使用 SSH 傳輸的協定。  
+
+## (3) 提交更新到版本控制倉庫 ##
+
+現在有一個Git版本控制倉庫，而且有一份已放到工作複本的該專案的檔案。 需要做一些修改並提交這些更動的快照到版本控制倉庫，當這些修改到達想要記錄狀態的情況。
+
+記住工作目錄內的每個檔案可能為兩種狀態的任一種：``追蹤``或者``尚未被追蹤``。  
+被追蹤的檔案是最近的快照；它們可被復原、修改，或者暫存。  
+未被追蹤的檔案則是其它未在最近快照也未被暫存的任何檔案。 當第一次複製保存器時，讀者所有檔案都是被追蹤且未被修改的。 因為剛取出它們而且尚未做任何修改。
+
+只要編輯任何已被追蹤的檔案。 Git將它們視為被更動的，因為將它們改成與最後一次提交不同。 暫存這些已更動檔案並提供所有被暫存的更新。 
+
+### (4) 檢視檔案的狀態 ###
+
+主要用來檢視檔案的狀態是 ``git status ``命令。 若讀者在複製完複本後馬上執行此命令，會看到如下的文字：
+
+	(base) dongde-MacBook-Pro:Git-github_notes dongguan-cheng $ git status
+	On branch main
+	Your branch is up to date with 'origin/main'.
+	nothing to commit, working tree clean
+
+Wokring directory clean意謂著目前的工作目錄沒有未被追蹤或已被修改的檔案。Git未看到任何未被追蹤的檔案，否則會將它們列出。 最後，這個命令告訴我們目前在哪一個分支(branch)。到目前為止，一直都是master，這是預設的。之後會詳細介紹分支(branch)，目前我們先不考慮它。
+
+假設新增一些檔案到專案，如`README`。 若該檔案先前並不存在，執行 `git status` 命令後，將會看到未被追蹤的檔案，如下：
+
+	$ vim bill
+	$ git status
+	On branch main
+	Your branch is up to date with 'origin/main'.
+
+	Untracked files:
+  	(use "git add <file>..." to include in what will be committed)
+	.bill.swp
+
+	nothing added to commit but untracked files present (use "git add" to track)
+
+
+我們可以看到新增的`bill`尚未被追蹤，因為它被列在輸出訊息的 Untracked files 下方。 除非我們明確指定要將該檔案加入提交的快照，Git不會主動將它加入。這樣可以避免加入一些二進位格式的檔案或其它使用者不想列入追蹤的檔案。 不過在這個例子中，我們下一步的確是要將 `bill` 檔案加入追蹤:  
+
+### (5) 把新檔案列入追蹤並暫存 ###
+
+要追蹤新增的檔案，我們可以使用`git add`命令。例如:要追蹤`bill`檔案，可執行：
+
+	$ git add .bill.swp
+
+如此一來，我們重新檢查狀態(status)時，可看到`bill`檔案已被列入追蹤並且已被暫存：
+
+	$ git status
+	On branch main
+	Your branch is up to date with 'origin/main'.
+
+	Changes to be committed:
+  	(use "git restore --staged <file>..." to unstage)
+	new file:   .bill.swp
+
+	
+因為它被放在Changes to be commited文字下方，我們可得知它已被暫存起來。 若此時提交更新，剛才執行`git add`加進來的檔案就會被記錄在歷史的快照。 這裡可回想一下先前執行`git init`後也有執行過`git add`，開始追蹤目錄內的檔案。`git add`命令可接受檔名或者目錄名。 若是目錄名，Git會以``遞迴(recursive)``的方式會將整個目錄下所有檔案及子目錄都加進來。
