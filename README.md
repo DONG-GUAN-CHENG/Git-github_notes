@@ -190,3 +190,62 @@ Glob pattern就像是shell使用的簡化版正規運算式。 星號（`*`）�
 
 記得提交記錄放在暫存區的快照。 任何未暫存的仍然保持在已被修改狀態；仍可進行其它的提交，將它增加到歷史。 每一次執行提交，都是記錄專案的快照，而且以後可用來比對或者復原。  
 
+### (10) 直接跳過暫存區域並提交 ###
+
+雖然優秀好用的暫存區域能很有技巧且精確的提交讀者想記錄的資訊，有時候暫存區域也比實際需要的工作流程繁瑣。 若想跳過暫存區域，Git提供了簡易的使用方式。 在`git commit`命令後方加上`-a`參數，Git``自動將所有已被追蹤且被修改的檔案送到暫存區域並開始提交程序``，讓讀者略過`git add`的步驟：
+
+	$ git commit -a-m "change"
+
+
+### 刪除檔案 ###
+
+要從Git刪除檔案，需要將它從已被追蹤檔案中移除（更精確的來說，是從暫存區域移除），並且提交。 `git rm`命令除了完成此工作外，也會將該檔案從工作目錄移除。 因此以後不會在未被追蹤檔案列表看到它。
+
+若僅僅是將檔案從工作目錄移除 (rm)，那麼在`git status`的輸出，可看見該檔案將會被視為“已被變更且尚未被更新”（也就是尚未存到暫存區域）：
+
+	$ rm README888.md 
+	$ git status
+	On branch main
+	Your branch is ahead of 'origin/main' by 1 commit.
+	  (use "git push" to publish your local commits)
+
+	Changes not staged for commit:
+	  (use "git add/rm <file>..." to update what will be committed)
+	  (use "git restore <file>..." to discard changes in working directory)
+		deleted:    README888.md
+	Untracked files:
+	  (use "git add <file>..." to include in what will be committed)
+		.DS_Store
+
+	no changes added to commit (use "git add" and/or "git commit -a")
+
+接著，若執行`git rm`，則會將暫存區域內的該檔案移除：
+
+	$ git rm README888.md
+	rm 'README888.md'
+	$ ls
+	LICENSE		README.md
+	$ git status
+	On branch main
+	Your branch is ahead of 'origin/main' by 1 commit.
+	  (use "git push" to publish your local commits)
+
+	Changes to be committed:
+	  (use "git restore --staged <file>..." to unstage)
+		deleted:    README888.md
+
+下一次提交時，該檔案將會消失而且不再被追蹤。 若已更動過該檔案且將它記錄到暫存區域。 必須使用`-f`參數才能將它強制移除。 這是為了避免已被記錄的快照意外被移除且再也無法使用Git復原。
+
+其它有用的技巧是保留工作目錄內的檔案，但從暫存區域移除。 換句話說，或許讀者想在磁碟機上的檔案且不希望Git繼續追蹤它。 這在讀者忘記將某些檔案記錄到`.gitignore`且不小心將它增加到暫存區域時特別有用。 比如說：巨大的記錄檔、或大量在編譯時期產生的`.a`檔案。 欲使用此功能，加上`--cached`參數：
+
+	$ git rm --cached readme.txt
+
+除了檔名、目錄名以外，還可以指定簡化的正規運算式給`git rm`命令。 這意謂著可執行類似下列指令：
+
+	$ git rm log/\*.log
+
+注意星號（`*`）前方的倒斜線（`\`）。 這是必須的，因為Git會在shell以上執行檔案的擴展。 此命令移除log目錄下所有檔名以`.log`結尾的檔案。 讀者也可以執行類似下列命令：
+
+	$ git rm \*~
+
+此命令移除所有檔名以`~`結尾的檔案。
