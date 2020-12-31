@@ -94,3 +94,97 @@ Wokring directory clean意謂著目前的工作目錄沒有未被追蹤或已被
 
 	
 因為它被放在Changes to be commited文字下方，我們可得知它已被暫存起來。 若此時提交更新，剛才執行`git add`加進來的檔案就會被記錄在歷史的快照。 這裡可回想一下先前執行`git init`後也有執行過`git add`，開始追蹤目錄內的檔案。`git add`命令可接受檔名或者目錄名。 若是目錄名，Git會以``遞迴(recursive)``的方式會將整個目錄下所有檔案及子目錄都加進來。
+
+### (6) 暫存已修改檔案 ###
+
+讓我們修改已被追蹤的檔案。 若修改先前已被追蹤的檔案，名為`billmodefy`，並檢查目前版本控制倉庫的狀態。`billmodify`檔案出現在 “Changes not staged for commit” 下方，代表著這個檔案已被追蹤，而且位於工作目錄的該檔案已被修改，但尚未暫存。 要暫存該檔案，可執行`git add`命令（這是一個多重用途的指令）。現在，再使用 `git add` 將`billmodify`檔案暫存起來，並再度執行`git status`，可發現`billmodify`被列入追蹤並且被暫存  
+
+接下來假設仍需要對`billmodify`做一點修改後才要提交，可再度開啟並編輯該檔案。 然而，當我們再度執行`git status`，會發現`Changes not staged for commit:`下方又會出現`billmodify`  
+
+而現在`billmodify`同時被列在已被暫存及未被暫存。 這表示Git的確在執行`git add`命令後，將檔案暫存起來。 若現在提交更新，最近一次執行`git add`命令時暫存的`billmodify`會被提交。 若在`git add`後修改檔案，需要再度執行`git add`才能將最新版的檔案暫存起來  
+
+### (7) 忽略某些檔案 ###
+
+通常會有一類不想讓Git自動新增，也不希望它們被列入未被追蹤的檔案。 這些通常是自動產生的檔案，例如：記錄檔或者編譯系統產生的檔案。 在這情況下，可建立一個名為`.gitignore`檔案，列出符合這些檔案檔名的特徵。 以下是一個範例：
+
+	$ cat .gitignore
+	*.[oa]
+	*~
+
+第一列告訴Git忽略任何檔名為`.o`或`.a`結尾的檔案，它們是可能是編譯系統建置的程式碼時產生的目的檔及程式庫。 第二列告訴Git忽略所有檔名為~結尾的檔案，通常被很多文書編輯器，如：Emacs，使用的暫存檔案。 可能會想一併將log、tmp、pid目錄及自動產生的文件等也一併加進來。 依據類推。在要開始開發之前將`.gitignore`設定好，通常是一個不錯的點子。這樣子不會意外地將真的不想追蹤的檔案提交到Git版本控制倉庫。
+
+編寫`.gitignore`檔案的規則如下：
+
+*	空白列或者以#開頭的列會被忽略。
+*	可使用標準的Glob pattern。
+*	可以/結尾，代表是目錄。
+*	可使用!符號將特徵反過來使用。
+
+Glob pattern就像是shell使用的簡化版正規運算式。 星號（`*`）匹配零個或多個字元；`[abc]`匹配中括弧內的任一字元（此例為`a`、`b`、`c`）；問號（`?`）匹配單一個字元；中括孤內的字以連字符連接（如：`[0-9]`），用來匹配任何符合該範圍的字（此例為0到9）。
+
+以下是另一個`.gitignore`的範例檔案：
+
+	# 註解，會被忽略。
+	# 不要追蹤檔名為 .a 結尾的檔案
+	*.a
+	# 但是要追蹤 lib.a，即使上方已指定忽略所有的 .a 檔案
+	!lib.a
+	# 只忽略根目錄下的 TODO 檔案。 不包含子目錄下的 TODO
+	/TODO
+	# 忽略build/目錄下所有檔案
+	build/
+	# 忽略doc/notes.txt但不包含doc/server/arch.txt
+	doc/*.txt
+	# ignore all .txt files in the doc/ directory
+	doc/**/*.txt
+
+### (8) 檢視已暫存及尚未暫存的更動 ###
+
+在某些情況下，`git status`指令提供的資訊就太過簡要。
+有的時候我們不只想知道那些檔案被更動，而是想更進一步知道檔案的內容被做了那些修改，這時我們可以使用`git diff`命令。使用它時通常會是為了瞭解兩個問題：目前已做的修改但尚未暫存的內容是哪些？以及將被提交的暫存資料有哪些？儘管`git status`指令可以大略回答這些問題，但`git diff`可顯示檔案裡的哪些列被加入或刪除，以修補檔(patch)方式表達。  
+
+### (9) 提交修改 ###
+
+現在的暫存區域已被更新為我們想要的檔案，再來可開始提交變更的部份。 要記得任何尚未被暫存的新增檔案或已被修改但尚未使用`git add`暫存的檔案將不會被記錄在本次的提交中。 它們仍會以被修改的檔案的身份存在磁碟中。
+在這情況下，最後一次執行`git status`，會看到所有已被暫存的檔案，也準備好要提交修改。 最簡單的提交是執行`git commit`：
+
+	$ git commit
+
+執行此命令會叫出指定的編輯器。（由shell的$EDITOR環境變數指定，通常是vim或emacs。）
+
+編輯器會顯示如下文字（此範例為Vim的畫面）：
+
+
+	# Please enter the commit message for your changes. Lines starting
+	# with '#' will be ignored, and an empty message aborts the commit.
+	#
+	# On branch main
+	# Your branch is up to date with 'origin/main'.
+	#
+	# Changes to be committed:
+	#       new file:   .bill.swp
+	#       new file:   README888.md
+	#
+	# Untracked files:
+	#       .DS_Store
+	#
+	~                                                                               
+	~                                                                               
+	~                                                                               
+	~                                                                               
+	~                                                                               
+
+	"~/Git-github_notes/.git/COMMIT_EDITMSG" 14L, 318C
+
+可看到預設的提交訊息包含最近一次`git status`的輸出以註解方式呈現，以及螢幕最上方有一列空白列。 可移除這些註解後再輸入提交的訊息，或者保留它們，提醒你現在正在進行提交。（若想知道更動的內容，可傳遞-v參數給`git commit`。如此一來連比對的結果也會一併顯示在編輯器內，方便明確看到有什麼變更。） 當離開編輯器，Git會利用這些提交訊息產生新的提交（註解及比對的結果會先被濾除）。
+
+另一種方式則是在commit命令後方以`-m`參數指定提交訊息，如下：
+
+	$ git commit -m "Story 182: Fix benchmarks for speed"
+	[master 463dc4f] Story 182: Fix benchmarks for speed
+	 2 files changed, 3 insertions(+)
+	 create mode 100644 README
+
+現在讀者已建立第一個提交！ 讀者可從輸出的訊息看到此提交、放到哪個分支（`master`）、SHA-1查核碼（`463dc4f`）、有多少檔案被更動，以及統計此提交有多少列被新增及移除。
+
+記得提交記錄讀者放在暫存區的快照。 任何讀者未暫存的仍然保持在已被修改狀態；讀者可進行其它的提交，將它增加到歷史。 每一次讀者執行提交，都是記錄專案的快照，而且以後可用來比對或者復原。
