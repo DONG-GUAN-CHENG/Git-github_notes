@@ -23,6 +23,7 @@
 	$ git add *.python
 	$ git add README_bill
 	$ git commit -m 'initial project version'
+ps:假若為git add . ->.代表新增資料夾下所有檔案
 
 執行完畢大約只需要一分鐘。 現在，已經有個追蹤部份檔案及第一次提交內容的Git版本控制倉庫。
 
