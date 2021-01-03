@@ -4,7 +4,7 @@
 這裡將講解大部份最常被使用的Git基本指令。 讓我們能夠去``組態及初始化一個版本控制倉庫(repository)``、``開始及停止追蹤檔案(track)、暫存(stage)及提交(commit)更新``。還會提到如何讓``Git忽略某些檔案``、``如何輕鬆且很快地救回失誤``、``如何瀏覽讀者的專案歷史及觀看各個已提交的更新之間的變更``、以及如何從遠端版本控制倉庫拉``(pull)``更新下來或將更新推``(push)``上去。
 
 
-## 取得Git版本控制倉庫 ##
+## 取得Git版本控制倉庫並提交到github ##
 
 一般可以使用兩種主要的方法取得一個Git版本控制倉庫。 第一種是將現有的專案或者目錄匯入Git。 第二種從其它伺服器複製一份已存在的Git版本控制倉庫。
 
@@ -23,7 +23,17 @@
 	$ git add *.python
 	$ git add README_bill
 	$ git commit -m 'initial project version'
-ps:假若為git add . ->.代表新增資料夾下所有檔案
+ps:假若為git add . ->.代表新增資料夾下所有檔案  
+
+ex:完整流程
+
+	echo "# knkn" >> README.md
+	git init
+	git add README.md
+	git commit -m "first commit"
+	git branch -M main
+	git remote add origin git@github.com:DONG-GUAN-CHENG/knkn.git
+	git push -u origin main
 
 執行完畢大約只需要一分鐘。 現在，已經有個追蹤部份檔案及第一次提交內容的Git版本控制倉庫。
 
